@@ -25,6 +25,14 @@ input[type=text]:focus {
   outline: none;
 }
 
+.title {
+  min-height: 4em;
+  max-width: 40em;
+  padding-bottom: 2em;
+
+  text-align: center;
+}
+
 .text {
   min-height: 4em;
   max-width: 40em;

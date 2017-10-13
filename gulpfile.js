@@ -7,7 +7,6 @@ const plumber = require('gulp-plumber');
 const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const server = require('browser-sync').create();
-const mocha = require('gulp-mocha');
 const mqpacker = require('css-mqpacker');
 const minify = require('gulp-csso');
 const rename = require('gulp-rename');
@@ -101,7 +100,12 @@ gulp.task('assemble', ['clean'], function () {
 
 gulp.task('build', ['assemble', 'imagemin']);
 
+const mocha = require('gulp-mocha');
 gulp.task('test', function () {
-  return gulp
-    .src(['js/**.test.js']);
+  return gulp.src(['js/**/**.test.js'], {read: false})
+  .pipe(mocha(
+    {
+      reporter: 'list',
+      compilers: ['js:babel-register']
+    }));
 });

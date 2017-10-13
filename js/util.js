@@ -6,7 +6,7 @@ export const createElement = (template) => {
 
 const main = document.getElementById(`main`);
 
-export const changeView = (element) => {
+export const changeView = (view) => {
   main.innerHTML = ``;
-  main.appendChild(element);
+  main.appendChild(view.element);
 };

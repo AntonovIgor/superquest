@@ -1,4 +1,4 @@
-import game from './game';
 import {changeView} from './util';
+import showWelcome from './welcome/welcome';
 
-changeView(game);
+changeView(showWelcome());
