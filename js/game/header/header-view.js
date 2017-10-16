@@ -1,4 +1,4 @@
-import AbstractView from '../view';
+import AbstractView from '../../view';
 
 const drawHeart = (full) => {
   return `<span class="heart__${full ? `full` : `empty`}">${full ? `&#9829;` : `&#9825;`}</span>`;

@@ -1,6 +1,6 @@
 import AbstractView from '../view';
-import HeaderView from './header-view';
-import LevelView from './level-view';
+import HeaderView from './header/header-view';
+import LevelView from './level/level-view';
 
 const update = (container, view) => {
   container.innerHTML = ``;
