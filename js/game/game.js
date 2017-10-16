@@ -1,45 +1,52 @@
-import {initialGame, Result} from '../data/quest';
-import LevelView from './game-view';
+import {initialGame, quest, Result} from '../data/quest';
 import {changeView} from '../util';
 import App from '../application';
 import GameModel from './game-model';
+import GameView from './game-view';
 
 class GameScreen {
+  constructor(data = quest) {
+    this.model = new GameModel(data);
+    this.view = new GameView(this.model);
+
+    this.view.onAnswer = (answer) => this.onAnswer(answer);
+  }
 
   init(state = initialGame) {
-    this.model = new GameModel(state);
+    this.model.update(state);
+    changeView(this.view);
     this.changeLevel();
   }
 
-  changeLevel() {
-    this.level = new LevelView(this.model.state);
+  onAnswer(answer) {
+    this.stopTimer();
+    switch (answer.result) {
+      case Result.DIE:
+        this.model.die();
+        App.die(this.model.state);
+        break;
+      case Result.WIN:
+        App.win(this.model.state);
+        break;
+      case Result.NEXT:
+        this.model.nextLevel();
+        this.changeLevel();
+        break;
+      default:
+        throw new Error(`Unknown result ${answer.result}`);
+    }
+  }
 
-    this.level.onAnswer = (answer) => {
-      this.stopTimer();
-      switch (answer.result) {
-        case Result.DIE:
-          this.model.die();
-          App.die(this.model.state);
-          break;
-        case Result.WIN:
-          App.win(this.model.state);
-          break;
-        case Result.NEXT:
-          this.model.nextLevel();
-          this.changeLevel();
-          break;
-        default:
-          throw new Error(`Unknown result ${answer.result}`);
-      }
-    };
-    changeView(this.level);
-    this.level.focus();
+  changeLevel() {
+    this.view.updateLevel();
+
+    this.view.focus();
     this.tick();
   }
 
   tick() {
     this.model.tick();
-    this.level.updateTime(this.model.state.time);
+    this.view.updateHeader();
 
     this.timer = setTimeout(() => this.tick(), 1000);
   }

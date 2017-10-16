@@ -7,7 +7,7 @@ export default class AbstractView {
   }
 
   render() {
-    return createElement(this.template);
+    return createElement(this.template.trim());
   }
 
   bind() {
