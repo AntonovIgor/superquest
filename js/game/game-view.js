@@ -22,22 +22,23 @@ const drawHeader = (data) => {
 export default class LevelView extends AbstractView {
   constructor(state) {
     super();
-    this.state = state;
+    this.model = state;
   }
 
   get template() {
-    const level = getLevel(this.state.level);
+    const level = getLevel(this.model.level);
 
     const answerNames = Object.keys(level.answers);
     const answers = answerNames.map((key) => ({key, value: level.answers[key]}));
 
     return `
-    ${drawHeader(this.state)}
+    ${drawHeader(this.model)}
     <div class="quest">
       <p class="text">${level.text}</p>
       <input type="text">
       <ul class="answers">
-        ${answers.map(({key, value}) => `<li class="answer" data-key="${key}">${key}. ${value.description}</li>`).join(``)}
+        ${answers.map(({key, value}) => `<li class="answer" data-key="${key}">${key}. ${value.description}</li>`).
+      join(``)}
       </ul>  
     </div>
     <small>Для справки введите <i>help</i></small>`.trim();
@@ -45,11 +46,11 @@ export default class LevelView extends AbstractView {
 
   bind() {
     this.timeElement = this.element.querySelector(`.time`);
-    const input = this.element.querySelector(`input`);
-    input.onkeydown = (evt) => {
+    this.input = this.element.querySelector(`input`);
+    this.input.onkeydown = (evt) => {
       if (evt.keyCode === ENTER_KEYCODE) {
-        const level = getLevel(this.state.level);
-        const answer = level.answers[input.value.toUpperCase()];
+        const level = getLevel(this.model.level);
+        const answer = level.answers[this.input.value.toUpperCase()];
 
         if (answer) {
           this.onAnswer(answer);
@@ -61,7 +62,7 @@ export default class LevelView extends AbstractView {
     answersElement.onclick = (evt) => {
       const target = evt.target;
       if (target.tagName.toLowerCase() === `li`) {
-        const level = getLevel(this.state.level);
+        const level = getLevel(this.model.level);
         const answer = level.answers[target.dataset.key.toUpperCase()];
 
         if (answer) {
@@ -73,6 +74,10 @@ export default class LevelView extends AbstractView {
 
   updateTime(time) {
     this.timeElement.textContent = time;
+  }
+
+  focus() {
+    this.input.focus();
   }
 
   onAnswer(answer) {
