@@ -1,46 +1,59 @@
-import {initialGame, nextLevel, Result, setLives, tick} from '../data/quest';
-import LevelView from './level-view';
+import {initialGame, quest, Result} from '../data/quest';
 import {changeView} from '../util';
-import gameover from '../gameover/gameover';
+import App from '../application';
+import GameModel from './game-model';
+import GameView from './game-view';
 
-const changeLevel = (state) => {
-  const level = new LevelView(state);
+class GameScreen {
+  constructor(data = quest) {
+    this.model = new GameModel(data);
+    this.view = new GameView(this.model);
 
-  let timer;
-  const startTimer = () => {
-    timer = setTimeout(() => {
-      state = tick(state);
-      level.updateTime(state.time);
-      startTimer();
-    }, 1000);
-  };
-  startTimer();
+    this.view.onAnswer = (answer) => this.onAnswer(answer);
+  }
 
-  level.onAnswer = (answer) => {
-    clearTimeout(timer);
+  init(state = initialGame) {
+    this.model.update(state);
+    changeView(this.view);
+    this.changeLevel();
+  }
+
+  onAnswer(answer) {
+    this.stopTimer();
     switch (answer.result) {
       case Result.DIE:
-        const deadScreen = gameover(false);
-        deadScreen.onRepeat = () => {
-          changeView(changeLevel(setLives(state, state.lives - 1)));
-        };
-        changeView(deadScreen);
+        this.model.die();
+        App.die(this.model.state);
         break;
       case Result.WIN:
-        const winScreen = gameover(true);
-        winScreen.onRepeat = () => {
-          changeView(changeLevel(initialGame));
-        };
-        changeView(winScreen);
+        App.win(this.model.state);
         break;
       case Result.NEXT:
-        changeView(changeLevel(nextLevel(state)));
+        this.model.nextLevel();
+        this.changeLevel();
         break;
       default:
         throw new Error(`Unknown result ${answer.result}`);
     }
-  };
-  return level;
-};
+  }
 
-export default () => changeLevel(initialGame);
+  changeLevel() {
+    this.view.updateLevel();
+
+    this.view.focus();
+    this.tick();
+  }
+
+  tick() {
+    this.model.tick();
+    this.view.updateHeader();
+
+    this.timer = setTimeout(() => this.tick(), 1000);
+  }
+
+  stopTimer() {
+    clearTimeout(this.timer);
+  }
+}
+
+export default new GameScreen();

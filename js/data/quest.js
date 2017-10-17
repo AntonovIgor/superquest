@@ -19,7 +19,7 @@ export const tick = (game) => {
   return game;
 };
 
-export const getLevel = (num) => quest[`level-${num}`];
+export const getLevel = (num, data = quest) => data[`level-${num}`];
 
 export const nextLevel = (state) => {
   const next = state.level + 1;
