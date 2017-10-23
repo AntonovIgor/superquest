@@ -21,9 +21,9 @@ export const tick = (game) => {
 
 export const getLevel = (num, data = quest) => data[`level-${num}`];
 
-export const nextLevel = (state) => {
+export const nextLevel = (state, data = quest) => {
   const next = state.level + 1;
-  if (!getLevel(next)) {
+  if (!getLevel(next, data)) {
     throw new RangeError(`Can't find level ${next}`);
   }
   state = Object.assign({}, state);
@@ -69,37 +69,6 @@ export const quest = {
       [JUMP]: {
         result: Result.DIE,
         description: `Вы прыгнете вверх`
-      }
-    }
-  },
-  'level-1': {
-    text: `Теперь, когда угроза быть убитым грибом миновала, вы можете спокойно оглядеться по сторонам. Вы видите что 
-    над вами прямо в двумерном небе висят кирпичные блоки, которые перемежаются с непонятными металлическими 
-    конструкциями. Что вы предпримете?`,
-    answers: {
-      [JUMP]: {
-        result: Result.NEXT,
-        description: `Как что, конечно же подпрыгну и со всей силы ударюсь головой о железяку!`
-      }
-    }
-  },
-  'level-2': {
-    text: `Вы проохите немного вперед и снова видите над головой кирпичную кладку. Вы хотите проверить свои новые 
-    силы и со всего размаху бъетесь об нее головой. На этот раз кирпичи разлетаются во все стороны. Вы начинаете 
-    радостно прыгать и разносить головой все кирпичи, но случайно ударяетесь о еще одну металлическую штуку и видите 
-    как из нее вырастает цветок. Ваши действия?`,
-    answers: {
-      [ONE]: {
-        description: `Конечно же съесть его!`,
-        result: Result.WIN
-      },
-      [TWO]: {
-        description: `Растоптать цветок!`,
-        result: Result.DIE
-      },
-      [THREE]: {
-        description: `В панике убежать...`,
-        result: Result.DIE
       }
     }
   }

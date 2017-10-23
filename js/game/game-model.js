@@ -15,7 +15,7 @@ export default class GameModel {
   }
 
   nextLevel() {
-    this.update(nextLevel(this.state));
+    this.update(nextLevel(this.state, this.data));
   }
 
   tick() {
