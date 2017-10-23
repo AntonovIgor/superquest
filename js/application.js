@@ -1,8 +1,12 @@
 import welcomeScreen from './welcome/welcome';
-import gameScreen from './game/game';
+import GameScreen from './game/game';
 import {initialGame} from './data/quest';
 import GameOverScreen from './gameover/gameover';
 import scoreboard from './scoreboard/scoreboard';
+import Loader from './loader';
+import SplashScreen from './splash/splash-screen';
+import adapt from './data/quest-adapter';
+import {changeView} from './util';
 
 const dieScreen = new GameOverScreen(false);
 
@@ -24,25 +28,25 @@ const loadState = (dataString) => {
   }
 };
 
-const routes = {
-  [ControllerId.WELCOME]: welcomeScreen,
-  [ControllerId.GAME]: gameScreen,
-  [ControllerId.SCORE]: scoreboard
-};
-
 export default class Application {
-  static init() {
+  static init(questData) {
+    this.routes = {
+      [ControllerId.WELCOME]: welcomeScreen,
+      [ControllerId.GAME]: new GameScreen(questData),
+      [ControllerId.SCORE]: scoreboard
+    };
+
     const hashChangeHandler = () => {
       const hashValue = location.hash.replace(`#`, ``);
       const [id, data] = hashValue.split(`?`);
-      this.changeHash(id, data);
+      Application.changeHash(id, data);
     };
     window.onhashchange = hashChangeHandler;
     hashChangeHandler();
   }
 
   static changeHash(id, data) {
-    const controller = routes[id];
+    const controller = this.routes[id];
     if (controller) {
       controller.init(loadState(data));
     }
@@ -65,4 +69,12 @@ export default class Application {
   }
 }
 
-Application.init();
+const splash = new SplashScreen();
+changeView(splash);
+splash.start();
+
+Loader.loadData().
+  then(adapt).
+  then((questData) => Application.init(questData)).
+  then(() => splash.stop()).
+  catch(window.console.error);
