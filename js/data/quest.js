@@ -21,9 +21,9 @@ export const tick = (game) => {
 
 export const getLevel = (num, data = quest) => data[`level-${num}`];
 
-export const nextLevel = (state) => {
+export const nextLevel = (state, data = quest) => {
   const next = state.level + 1;
-  if (!getLevel(next)) {
+  if (!getLevel(next, data)) {
     throw new RangeError(`Can't find level ${next}`);
   }
   state = Object.assign({}, state);

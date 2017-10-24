@@ -2,13 +2,16 @@ import ScoreBoardView from './scoreboard-view';
 import {changeView} from '../util';
 import App from '../application';
 
+import Loader from '../loader';
+
 class ScoreBoardScreen {
-  init(state) {
-    const view = new ScoreBoardView([state]);
-    view.onRepeat = () => {
-      App.startGame();
-    };
+  init() {
+    const view = new ScoreBoardView();
+
+    view.onRepeat = () => App.showWelcome();
     changeView(view);
+
+    Loader.loadResults().then((scores) => view.printScores(scores));
   }
 }
 

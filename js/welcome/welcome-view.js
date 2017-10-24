@@ -9,7 +9,8 @@ export default class WelcomeView extends AbstractView {
     return `
 <div class="quest">
   <p class="title">С У П Е Р К В Е С Т</p>
-  <p class="text">Это игра, где вы — главное действующее лицо. И от ваших действий зависит успех и победа в этой игре.</p>
+  <p class="text">Это игра, где вы — главное действующее лицо. И от ваших действий зависит успех и победа в этой игре.
+  Ознакомиться с таблицей победителей можно <a href="#score">здесь.</a></p>
   <p class="text">Набери в поле ввода <b>${START_COMMAND}</b>, чтобы начать игру!"</p>
   <input type="text">
 </div>`.trim();

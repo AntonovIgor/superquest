@@ -1,8 +1,12 @@
 import welcomeScreen from './welcome/welcome';
-import gameScreen from './game/game';
+import GameScreen from './game/game';
 import {initialGame} from './data/quest';
 import GameOverScreen from './gameover/gameover';
 import scoreboard from './scoreboard/scoreboard';
+import Loader from './loader';
+import SplashScreen from './splash/splash-screen';
+import adapt from './data/quest-adapter';
+import {changeView} from './util';
 
 const dieScreen = new GameOverScreen(false);
 
@@ -12,39 +16,26 @@ const ControllerId = {
   SCORE: `score`
 };
 
-const saveState = (state) => {
-  return JSON.stringify(state);
-};
-
-const loadState = (dataString) => {
-  try {
-    return JSON.parse(dataString);
-  } catch (e) {
-    return initialGame;
-  }
-};
-
-const routes = {
-  [ControllerId.WELCOME]: welcomeScreen,
-  [ControllerId.GAME]: gameScreen,
-  [ControllerId.SCORE]: scoreboard
-};
-
 export default class Application {
-  static init() {
+  static init(questData) {
+    Application.routes = {
+      [ControllerId.WELCOME]: welcomeScreen,
+      [ControllerId.GAME]: new GameScreen(questData),
+      [ControllerId.SCORE]: scoreboard
+    };
+
     const hashChangeHandler = () => {
       const hashValue = location.hash.replace(`#`, ``);
-      const [id, data] = hashValue.split(`?`);
-      this.changeHash(id, data);
+      Application.changeHash(hashValue);
     };
     window.onhashchange = hashChangeHandler;
     hashChangeHandler();
   }
 
-  static changeHash(id, data) {
-    const controller = routes[id];
+  static changeHash(id) {
+    const controller = Application.routes[id];
     if (controller) {
-      controller.init(loadState(data));
+      controller.init();
     }
   }
 
@@ -53,7 +44,7 @@ export default class Application {
   }
 
   static startGame(state = initialGame) {
-    location.hash = `${ControllerId.GAME}?${saveState(state)}`;
+    Application.routes[ControllerId.GAME].init(state);
   }
 
   static die(state) {
@@ -61,8 +52,18 @@ export default class Application {
   }
 
   static win(state) {
-    location.hash = `${ControllerId.SCORE}?${saveState(state)}`;
+    Loader.saveResults(state).then(() => {
+      location.hash = ControllerId.SCORE;
+    });
   }
 }
 
-Application.init();
+const splash = new SplashScreen();
+changeView(splash);
+splash.start();
+
+Loader.loadData().
+  then(adapt).
+  then((questData) => Application.init(questData)).
+  then(() => splash.stop()).
+  catch(window.console.error);
