@@ -7,7 +7,7 @@ export default class ScoreBoardView extends AbstractView {
   get template() {
     return `
 <div class="end">
-  <div class="scoreboard"></div>
+  <div class="scoreboard">Загружаем данные</div>
   <br>
   <div class="repeat"><span class="repeat-action">Сыграть заново</span>&nbsp;|&nbsp;<span class="repeat-action">Выйти</a>🐌</div>
 </div>`;

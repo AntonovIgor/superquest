@@ -8,9 +8,7 @@ class ScoreBoardScreen {
   init() {
     const view = new ScoreBoardView();
 
-    view.onRepeat = () => {
-      App.startGame();
-    };
+    view.onRepeat = () => App.showWelcome();
     changeView(view);
 
     Loader.loadResults().then((scores) => view.printScores(scores));
