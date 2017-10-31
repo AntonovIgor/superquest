@@ -17,6 +17,22 @@ const ControllerId = {
 };
 
 export default class Application {
+  static async prepareDataAndInit() {
+    const splash = new SplashScreen();
+    changeView(splash);
+    splash.start();
+
+    try {
+      const data = await Loader.loadData();
+      const questData = await adapt(data);
+      Application.init(questData);
+    } catch (e) {
+      splash.showError(e.message);
+    } finally {
+      splash.stop();
+    }
+  }
+
   static init(questData) {
     Application.routes = {
       [ControllerId.WELCOME]: welcomeScreen,
@@ -51,19 +67,10 @@ export default class Application {
     dieScreen.init(state);
   }
 
-  static win(state) {
-    Loader.saveResults(state).then(() => {
-      location.hash = ControllerId.SCORE;
-    });
+  static async win(state) {
+    await Loader.saveResults(state);
+    location.hash = ControllerId.SCORE;
   }
 }
 
-const splash = new SplashScreen();
-changeView(splash);
-splash.start();
-
-Loader.loadData().
-  then(adapt).
-  then((questData) => Application.init(questData)).
-  then(() => splash.stop()).
-  catch(window.console.error);
+Application.prepareDataAndInit();

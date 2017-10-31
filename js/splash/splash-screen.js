@@ -12,6 +12,10 @@ export default class SplashScreen extends AbstractView {
     return `<div></div>`;
   }
 
+  showError(errorMessage) {
+    this.element.textContent = errorMessage;
+  }
+
   start() {
     this.cursor = ++this.cursor >= this.symbolsSeq.length ? 0 : this.cursor;
     this.element.textContent = this.symbolsSeq[this.cursor];

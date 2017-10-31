@@ -37,12 +37,36 @@ gulp.task('style', function () {
 
 const rollup = require('gulp-better-rollup');
 const sourcemaps = require('gulp-sourcemaps');
+const resolve = require('rollup-plugin-node-resolve');
+const commonjs = require('rollup-plugin-commonjs');
+const babel = require('rollup-plugin-babel');
+const uglify = require('gulp-uglify');
 gulp.task('scripts', function () {
   return gulp.src('js/main.js')
     .pipe(plumber())
     .pipe(sourcemaps.init())
     // note that UMD and IIFE format requires
-    .pipe(rollup({}, 'iife'))
+    .pipe(rollup({
+      plugins: [
+        // resolve node_modules
+        resolve({browser: true}),
+        // resolve commonjs imports
+        commonjs(),
+        // use babel to transpile into ES5
+        babel({
+          babelrc: false,
+          exclude: 'node_modules/**',
+          presets: [
+            ['env', {modules: false}]
+          ],
+          plugins: [
+            'external-helpers',
+          ]
+        })
+      ]
+    }, 'iife'))
+    // Uglify
+    .pipe(uglify())
     // save sourcemap as separate file (in the same folder)
     .pipe(sourcemaps.write(''))
     .pipe(gulp.dest('build/js'));
